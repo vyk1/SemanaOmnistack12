@@ -1,0 +1,44 @@
+No Typescript precisa vir com definição de tipos
+Às vezes vem separada
+E precisa ser adicionada
+
+Comandos(NOTE:):
+: yarn add @types/express -D
+: yarn add typescript -D
+: yarn add ts-node -D
+: npx tsc --init
+: yarn add ts-node-dev -D
+
+Não é possível executar Typescript diretamente com o node, portanto,
+Precisa de uma dependência a partir do (:3)
+
+Para executar essa doideira: 
+1. npx-> Serve para executar um pacote instalado
+     Binários são scripts executáveis
+2. configuração com o (:4)
+3. npx ts-node src/server.ts
+
+Rota: Completa
+Recurso: Qual a entidade a ser acessada
+
+GET, POST, PUT, DELETE, OPTIONS ...
+
+Query: é opcional ?status=1 -> filtro, paginação ...
+Request: é obrigatório -> :id
+Request Body: Parametros para criação/atualização
+
+Points X Items Gera Points_Items (n-n)
+
+Migrations => Histórico do BD
+
+-> Up faz 
+-> Down volta
+
+Fazer:
+npx knex migrate:latest --knexfile knexfile.ts migrate:latest
+
+Extensão SQLite <3
+
+Service e Repository Patterns...
+
+#prestar atenção no commit() do transact!

@@ -1,26 +1,13 @@
 import express from "express";
+import path from "path"
+import cors from "cors"
 
-// No Typescript precisa vir com definição de tipos
-// Às vezes vem separada
-// E precisa ser adicionada
+import routes from "./routes";
 
-// Comandos(NOTE:):
-// : yarn add @types/express -D
-// : yarn add typescript -D
-// : yarn add ts-node -D
-// : npx tsc --init
-// : yarn add ts-node-dev -D
-
-// Não é possível executar Typescript diretamente com o node, portanto,
-// Precisa de uma dependência a partir do (:3)
-
-// Para executar essa doideira: 
-// 1. npx-> Serve para executar um pacote instalado
-//      Binários são scripts executáveis
-// 2. configuração com o (:4)
-// 3. npx ts-node src/server.ts
 const app = express()
 
-app.get('/users', (req, res) => res.json(["Remédios normais não amenizam a pressão", "Também morre quem atira"]))
-
+app.use(cors())
+app.use(express.json())
+app.use(routes)
+app.use('/uploads', express.static(path.resolve(__dirname, '..', 'uploads')))
 app.listen(3334)
