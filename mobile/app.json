@@ -1,0 +1,28 @@
+{
+  "expo": {
+    "name": "mobile",
+    "slug": "mobile",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./src/assets/logo.png",
+    "splash": {
+      "image": "./src/assets/logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#f0f0f5"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    }
+  }
+}
