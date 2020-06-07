@@ -5,7 +5,7 @@ export default class ItemsController {
 
     async index(req: Request, res: Response) {
         const items = await knex('items').select('*')
-        const host = 'http://localhost:3334/uploads/'
+        const host = 'http://192.168.0.102:3334/uploads/'
         const serializedItems = items.map(item => {
             return {
                 id: item.id,
