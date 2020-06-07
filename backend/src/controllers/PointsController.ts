@@ -9,29 +9,40 @@ export default class PointsController {
 
         const points = await knex('points')
             .join('points_items', 'points.id', '=', 'points_items.point_id')
-            // .whereIn('points_items.item_id', parsedItems)
+            .whereIn('points_items.item_id', parsedItems)
             .where('city', String(city))
             .where('uf', String(uf))
             .distinct()
             .select('points.*')
 
-        return res.json(points)
-
+        // Serializações // API Transform
+        const serializedPoints = points.map(point => {
+            return {
+                ...point,
+                image_url: `http://192.168.0.102:3334/uploads/${point.image}`
+            }
+        })
+        return res.json(serializedPoints)
     }
+
     async show(req: Request, res: Response) {
         const { id } = req.params
         // Sem first vem array
         const point = await knex('points').where('id', id).first()
 
         if (!point) return res.status(404).json({ message: "Ponto não encontrado" })
+        // Serrialziação // API Transform
+        const serializedPoint = {
+            ...point,
+            image_url: `http://192.168.0.102:3334/uploads/${point.image}`
+        }
 
         const items = await knex('items')
             .join('points_items', 'items.id', '=', 'points_items.item_id')
             .where('points_items.point_id', id)
-            // .select('items.title')
-            .select('*')
+            .select('items.title')
 
-        return res.json({ point, items })
+        return res.json({ point: serializedPoint, items })
 
     }
     async create(req: Request, res: Response) {
@@ -49,7 +60,7 @@ export default class PointsController {
         const trx = await knex.transaction()
 
         const point = {
-            image: 'https://images.unsplash.com/photo-1481761289552-381112059e05?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=80',
+            image: req.file.filename,
             name,
             email,
             whatsapp,
@@ -66,12 +77,16 @@ export default class PointsController {
         const point_id = insertedIds[0]
 
         // a serem inseridos
-        const pointsItems = items.map((item_id: number) => {
-            return {
-                item_id,
-                point_id
-            }
-        })
+        const pointsItems = items
+            .split(',')
+            // +=>converte para num (i.e. => +item.trim())
+            .map((item: string) => Number(item.trim()))
+            .map((item_id: number) => {
+                return {
+                    item_id,
+                    point_id
+                }
+            })
 
         await trx('points_items').insert(pointsItems)
         await trx.commit()

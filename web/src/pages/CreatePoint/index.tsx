@@ -7,6 +7,8 @@ import { Map, TileLayer, Marker, Popup } from 'react-leaflet';
 import api from '../../services/api';
 import Axios from 'axios';
 import { LeafletMouseEvent } from 'leaflet';
+import Dropzone from '../../components/Dropzone';
+
 
 interface Item {
     // Tipagem em minúsculo!
@@ -37,6 +39,7 @@ const CreatePoint = () => {
     const [selectedUf, setSelectedUf] = useState('0')
     const [selectedCity, setSelectedCity] = useState('0')
     const [selectedItems, setSelectedItems] = useState<number[]>([])
+    const [selectedFile, setSelectedFile] = useState<File>()
 
     const history = useHistory()
 
@@ -45,7 +48,6 @@ const CreatePoint = () => {
         email: '',
         whatsapp: ''
     })
-
 
     function handleInputChange(e: ChangeEvent<HTMLInputElement>) {
         const { name, value } = e.target
@@ -82,22 +84,27 @@ const CreatePoint = () => {
     async function handleSubmit(e: FormEvent) {
         e.preventDefault()
 
+
         const { name, email, whatsapp } = formData
         const uf = selectedUf
         const city = selectedCity
         const [latitude, longitude] = selectedPosition
         const items = selectedItems
 
-        const data = {
-            name,
-            email,
-            whatsapp,
-            uf,
-            city,
-            latitude,
-            longitude,
-            items
+        const data = new FormData()
+        data.append('name', name)
+        data.append('email', email)
+        data.append('whatsapp', whatsapp)
+        data.append('uf', uf)
+        data.append('city', city)
+        data.append('latitude', String(latitude))
+        data.append('longitude', String(longitude))
+        data.append('items', items.join(','))
+
+        if (selectedFile) {
+            data.append('image', selectedFile)
         }
+
         await api.post('/points', data)
         alert('Ponto de Coleta Criado Com Sucesso!')
         return history.push('/')
@@ -149,6 +156,7 @@ const CreatePoint = () => {
             </header>
             <form onSubmit={handleSubmit}>
                 <h1>Cadastro do <br /> ponto de coleta</h1>
+                <Dropzone onFileUpload={setSelectedFile} />
                 <fieldset>
                     <legend>
                         <h2>Dados</h2>
