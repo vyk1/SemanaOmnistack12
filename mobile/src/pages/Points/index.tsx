@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Text, Image, SafeAreaView, Alert } from 'react-native';
+import { View, StyleSheet, Text, Image, SafeAreaView, Alert, ActivityIndicator } from 'react-native';
 import { TouchableOpacity, ScrollView } from 'react-native-gesture-handler';
 import { Feather as Icon } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -34,47 +34,67 @@ const Points = () => {
   const [selectedItems, setSelectedItems] = useState<number[]>([])
   const [initialPosition, setInitialPosition] = useState<[number, number]>([0, 0])
   const navigation = useNavigation()
+  const [loaded, setLoaded] = useState(false)
+  const [error, setError] = useState(false)
+
   const route = useRoute()
   const routeParams = route.params as Params
 
   useEffect(() => {
     async function loadPosition() {
-      const { status } = await Location.requestPermissionsAsync()
+      setLoaded(false)
+      try {
+        const { status } = await Location.requestPermissionsAsync()
 
-      if (status !== 'granted') {
-        Alert.alert("Oooops", "Precisamos de sua permissão para obter a localização")
-        return
+        if (status !== 'granted') {
+          Alert.alert("Oooops", "Precisamos de sua permissão para obter a localização")
+          return
+        }
+        const location = await Location.getCurrentPositionAsync()
+        const { latitude, longitude } = location.coords
+
+        setInitialPosition([
+          latitude,
+          longitude
+        ])
+      } catch (error) {
+        setError(true)
       }
-      const location = await Location.getCurrentPositionAsync()
-      const { latitude, longitude } = location.coords
-
-      setInitialPosition([
-        latitude,
-        longitude
-      ])
+      finally {
+        setLoaded(true)
+      }
     }
     loadPosition()
   }, [])
 
   useEffect(() => {
-    api.get('/items').then(res => {
-      setItems(res.data)
-    })
+
+    setLoaded(false)
+    api.get('/items')
+      .then(res => {
+        setItems(res.data)
+      })
+      .catch(e => setError(true))
+      .finally(() => setLoaded(true))
+
   }, [])
 
   useEffect(() => {
+
+    setLoaded(false)
     api.get('/points', {
       params: {
         city: routeParams.city,
         uf: routeParams.uf,
         items: selectedItems
       }
-    }).then(res => {
-      console.log(selectedItems);
-      console.log(res.data);
-
-      setPoints(res.data)
     })
+      .then(res => {
+        setPoints(res.data)
+      })
+      .catch(e => setError(true))
+      .finally(() => setLoaded(true))
+
   }, [selectedItems])
 
   function handleNavigateBack() {
@@ -97,7 +117,13 @@ const Points = () => {
       setSelectedItems([...selectedItems, id])
     }
   }
+  if (!loaded) {
+    return <View style={{ flex: 1, justifyContent: 'center' }}><ActivityIndicator /></View>
+  }
 
+  if (error) {
+    return <Text>Ocorreu um erro...</Text>
+  }
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
@@ -169,6 +195,7 @@ const Points = () => {
           }
         </ScrollView>
       </View>
+      <Text>Total encontrados: {points.length}</Text>
     </SafeAreaView>
   )
 }

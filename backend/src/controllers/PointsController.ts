@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import knex from '../database/connection'
+import host from '../config/host'
 
 export default class PointsController {
     async index(req: Request, res: Response) {
@@ -19,7 +20,7 @@ export default class PointsController {
         const serializedPoints = points.map(point => {
             return {
                 ...point,
-                image_url: `http://192.168.0.102:3334/uploads/${point.image}`
+                image_url: `${host}/uploads/${point.image}`
             }
         })
         return res.json(serializedPoints)
@@ -34,7 +35,7 @@ export default class PointsController {
         // Serrialziação // API Transform
         const serializedPoint = {
             ...point,
-            image_url: `http://192.168.0.102:3334/uploads/${point.image}`
+            image_url: `${host}/uploads/${point.image}`
         }
 
         const items = await knex('items')
