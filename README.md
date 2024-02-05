@@ -15,10 +15,8 @@ Sistema de gerenciamento de pontos de coleta apelidado de 'Ecoleta'
 
 </br>
 
-<h1 align="center">
-    <img alt="Logo" src="./images/ecoleta1.jpg" width="300px" />
-    <img alt="Logo" src="./images/ecoleta3.jpg" width="300px" />
-</h1>
+<img alt="Logo" src="./images/ecoleta1.jpg" />
+<img alt="Logo" src="./images/ecoleta3.jpg" />
 </br>
 <h2 align="center">Aplicação Cliente (Mobile)</h2>
 </br>
